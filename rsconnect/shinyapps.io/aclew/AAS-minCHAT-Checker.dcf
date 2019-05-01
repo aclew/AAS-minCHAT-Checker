@@ -1,0 +1,13 @@
+name: AAS-minCHAT-Checker
+title: AAS-minCHAT-Checker
+username:
+account: aclew
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 902825
+bundleId: 2052895
+url: https://aclew.shinyapps.io/AAS-minCHAT-Checker/
+when: 1556723150.66963
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: input_files/.DS_Store
