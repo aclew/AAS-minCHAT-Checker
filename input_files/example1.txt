@@ -35,8 +35,8 @@ FA1	FA1	127772	128760	988	dpê lêpî mo, ndoo-?
 FA1	FA1	135985	136956	971	choo ndêghi ngmê nmê pwaapî.
 FA1	FA1	138262	139816	1554	kwi choo kââdî ndyîî ka kuwo ghi ngmê nmê pwaapî.
 Notes		23469	24755	1286	english word for bag.
-Notes		52600	53040	440	other name for Weta.
-Notes		53900	54603	703	other name for Minipw:ee.
+Notes		52600	53040	440	other name for Nnn.
+Notes		53900	54603	703	other name for Nnn.
 MA1	MA1	107	915	808	cardî@eng ngmê dómu kuwo apii?
 MA1	MA1	4481	6676	2195	mb:aamb:aa ngê chi mbúmu mêdpê pwy:ee ngi u kuwo mêdpê wini xxx.
 MA1	MA1	12317	13623	1306	Nnn ngê ndapê tp:oo dê ngê dómu kuwo dê.
