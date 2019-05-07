@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lubridate)
 
 check.annotations <- function(annfile) {
   #txt.input.path <- "input_files/"
@@ -13,6 +14,37 @@ check.annotations <- function(annfile) {
     tier = character(),
     value = character()
   )
+  
+  convert_ms_to_hhmmssms <- function(msectime) {
+    if (is.na(msectime)) {
+      return("none")
+    } else {
+      ms_p_hr <- 60*60*1000
+      ms_p_mn <- 60*1000
+      ms_p_sc <- 1000
+      hh <- floor(msectime/ms_p_hr)
+      if (hh < 10) {
+        hh <- paste0("0", hh)
+      }
+      msectime <- msectime%%ms_p_hr
+      mm <- floor(msectime/ms_p_mn)
+      if (mm < 10) {
+        mm <- paste0("0", mm)
+      }
+      msectime <- msectime%%ms_p_mn
+      ss <- floor(msectime/ms_p_sc)
+      if (ss < 10) {
+        ss <- paste0("0", ss)
+      }
+      msectime <- msectime%%ms_p_sc
+      msec <- msectime
+      if (msec < 100) {
+        msec <- paste0(msec, "0")
+      }
+      newtime <- paste0(hh, ":", mm, ":", ss, ".", msec)
+      return(newtime)
+    }
+  }
   
   add_alert <- function (filename, alert, onset, offset, tier, value) {
     bind_rows(alert.table, tibble(
@@ -280,6 +312,13 @@ check.annotations <- function(annfile) {
     alert.table <- bind_rows(alert.table,
                              empty.utts, nonterminating.utts, overterminating.utts,
                              squarebrace.utts, atsign.utts)
+    
+    # convert msec times to HHMMSS
+    alert.table <- alert.table %>%
+      rowwise() %>%
+      mutate(start = convert_ms_to_hhmmssms(onset),
+             stop = convert_ms_to_hhmmssms(offset)) %>%
+      select(-onset, -offset)
   
     # short list of known error types that this script doesn't check:
     # - spelling... anywhere
