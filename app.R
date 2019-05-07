@@ -34,7 +34,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   report <- eventReactive(input$submit, {
     req(input$file1)
-    check.annotations(input$file1$datapath)
+    check.annotations(input$file1$datapath, input$file1$name)
   })
 
   output$report <- renderUI({

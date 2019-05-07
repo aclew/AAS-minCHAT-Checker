@@ -1,7 +1,7 @@
 library(tidyverse)
 library(lubridate)
 
-check.annotations <- function(annfile) {
+check.annotations <- function(annfile, nameannfile) {
   #txt.input.path <- "input_files/"
   
   #filebatch <- dir(txt.input.path, pattern="*.txt")
@@ -64,7 +64,7 @@ check.annotations <- function(annfile) {
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(annfile, "\\.txt")))[1]
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1]
 #  filename <- as.character(annfile)
   
     
