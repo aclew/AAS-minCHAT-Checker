@@ -46,26 +46,30 @@ def eaf2txt(path_to_eaf, output_folder, cleanup=False):
     # tiers = {key: value for key, value in tiers.items() if key.startswith(('xds@', 'vcm@', 'lex@', 'mwu@'))}
     print(sorted(tiers.keys()))
     for tier in sorted(tiers.keys()):
-        # print(tier)
+        print(tier)
         try:
             annotations = EAF.get_annotation_data_for_tier(tier)
-        except KeyError:
+        except KeyError as e:
             print("Tier %s ignored..." %tier)
+            print(e.args)
         for annotation in annotations:
             parameters = EAF.get_parameters_for_tier(tier)
             # print(parameters)
-	    if 'PARTICIPANT' in parameters:
-                if len(annotation) == 4:
-                    onset, offset, receiver, transcript = annotation[0], annotation[1], annotation[2], annotation[3]
-                elif len(annotation) == 3:
-                    onset, offset, receiver, transcript = annotation[0], annotation[1], '', annotation[2]
-                else:
-                    raise ValueError("Format unknown : %s\n" % annotation)
-                speaker = parameters['PARTICIPANT']
+            if 'PARENT_REF' in parameters or 'PARTICIPANT' in parameters:
+                    if len(annotation) == 4:
+                        onset, offset, receiver, transcript = annotation[0], annotation[1], annotation[2], annotation[3]
+                    elif len(annotation) == 3:
+                        onset, offset, receiver, transcript = annotation[0], annotation[1], '', annotation[2]
+                    else:
+                        raise ValueError("Format unknown : %s\n" % annotation)
+                    speaker = tier if not '@' in tier else tier.split('@')[1]
 
-                if cleanup:
-                    transcript = clean_up_annotation(transcript)
-                output_file.write("%s\t%s\t%d\t%d\t%s\t%s\n" % (str(speaker), str(tier), onset, offset, str(receiver), str(transcript)))
+                    if cleanup:
+                        transcript = clean_up_annotation(transcript)
+                    output_file.write("%s\t%s\t%d\t%d\t%s\t%s\n" % (str(speaker), str(tier), onset, offset, str(receiver), str(transcript)))
+            if parameters['TIER_ID']=='code':
+                print(parameters)
+                output_file.write("%s\t%s\t%d\t%d\t%s\t%s\n" % ('', "code", annotation[0], annotation[1], "", ""))
     output_file.close()
 
 def main():
