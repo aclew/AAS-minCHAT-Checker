@@ -129,7 +129,7 @@ check.annotations <- function(annfile, nameannfile) {
                                      NA, NA, NA, NA)
           }
         } else {
-          if (filter(annots, tier == "lex@CHI") > 0 | filter(annots, tier == "mwu@CHI") > 0) {
+          if (nrow(filter(annots, tier == "lex@CHI")) > 0 || nrow(filter(annots, tier == "mwu@CHI")) > 0) {
             alert.table <- add_alert(filename,
                                      "too many LEX/MWU annotations", NA, NA, NA, NA)
           }
