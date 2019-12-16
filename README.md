@@ -12,7 +12,7 @@ It is up to you humans to fix those as needed! This is just a tool to help annot
 
 ## Instructions
 
-1. Export the .eaf file you want to check as a tab-delimited text (File > Save As > Tab-delimited text)
+1. Export the .eaf file you want to check as a tab-delimited text (File > Export As > Tab-delimited text)
 2. Go to https://aclew.shinyapps.io/AAS-minCHAT-Checker/
 3. Upload the file and click Submit
 4. Download the spreadsheet of possible errors detected
