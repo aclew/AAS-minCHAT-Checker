@@ -16,9 +16,9 @@ It is up to you humans to fix those as needed! This is just a tool to help annot
 3. Go to [https://aclew.shinyapps.io/AAS-minCHAT-Checker/]()
 4. Upload the file and click **Submit**
 5. Download the spreadsheet of possible errors detected; remember, this tool finds potential errors—it is your job to determine whether there are real errors!
-6. **REGARDLESS** of whether your file showed potential errors, now check for the following possible issues in your .eaf file:
-    - Any tiers that shouldn't belong (a common one is the `default` tier); the only tiers allowed should be speaker and dependent tiers (e.g., `FA1`, `xds@FA1`, `CHI`, `vcm@CHI`, `UC2`, `xds@MA3`, etc.), and the non-speaker tiers used across ACLEW corpora: `context`, `code_num`, `code`, and `notes`. Any tier that has has a name different from these _exact_ options should be deleted of fixed to fit these name options.
-    - Go to Tier > Change Tier Attributes... to view a table of your tiers. Check that each tier associated with a speaker (e.g., FA1 and xds@FA1) is associated with the correct participant name (e.g., FA1). If not, fix it. See Figure 2 for details.
+6. **REGARDLESS** of whether your file showed potential errors, now open your .eaf file in ELAN and check for the following possible issues:
+    - **Illegal, empty tiers:** These won't be caught by the checker. Illegal empty tiers are tiers with no annotations that have bad names (a common one is the `default` tier). Note that the only tiers allowed should be speaker and dependent tiers (e.g., `FA1`, `xds@FA1`, `CHI`, `vcm@CHI`, `UC2`, `xds@MA3`, etc.), and the non-speaker tiers used across ACLEW corpora: `context`, `code_num`, `code`, and `notes`. _Any tier that has has a name different from these **exact** options should be deleted/edited to fit these limited options._
+    - **Missing/incorrect participant names:** Go to Tier > Change Tier Attributes... to view a table of your tiers. Check that each tier associated with a speaker (e.g., FA1 and xds@FA1) is associated with the correct participant name (e.g., FA1). If not, fix it. See Figure 2 for details.
 7. Problems? See Error Reporting below.
 
 _Figure 1._ Select all tiers and make sure your time column settings are set up as shown below. When prompted about format type for export, select UTF-8.
