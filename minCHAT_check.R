@@ -327,17 +327,28 @@ check.annotations <- function(annfile, nameannfile) {
       squarebrace.utts, atsign.utts)
     
     # convert msec times to HHMMSS
-    alert.table <- alert.table %>%
-      rowwise() %>%
-      mutate(start = convert_ms_to_hhmmssms(onset),
-             stop = convert_ms_to_hhmmssms(offset)) %>%
-      select(-onset, -offset)
+    if (nrow(alert.table) > 0) {
+      alert.table <- alert.table %>%
+        rowwise() %>%
+        mutate(start = convert_ms_to_hhmmssms(onset),
+          stop = convert_ms_to_hhmmssms(offset)) %>%
+        select(-onset, -offset)
+      return(list(
+        alert.table = alert.table,
+        n.a.alerts = nrow(alert.table)
+      ))
+    } else {
+        alert.table.NA = tibble(
+          filename = filename,
+          alerts = "No errors detected! :D"
+        )
+        return(list(
+          alert.table = alert.table.NA,
+          n.a.alerts = 0
+        ))
+    }
 #  }
       
-    return(list(
-      alert.table = alert.table,
-      n.a.alerts = nrow(alert.table)
-    ))
   
   # write_csv(alert.table,
   #             paste0("possible_errors_detected-",

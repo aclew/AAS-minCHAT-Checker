@@ -21,7 +21,6 @@ ui <- fluidPage(
       # Submit button:
       actionButton("submit", "Submit")
     ),
-    
     # Main panel for displaying outputs ----
     mainPanel(
       uiOutput("report"),
@@ -57,7 +56,7 @@ server <- function(input, output) {
     output$downloadErrorsHandler <- downloadHandler(
       filename = paste0("minCHATerrorcheck-",time.now,"-possible_errors.csv"),
       content = function(file) {
-        write_csv(errors, file, )
+        write_csv(errors, file)
       },
       contentType = "text/csv"
     )
