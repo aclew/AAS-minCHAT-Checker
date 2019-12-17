@@ -41,7 +41,7 @@ server <- function(input, output) {
     
     tagList(
       tags$br(),
-      renderText(paste0("Number of possible errors found: ", as.character(report()$n.a.alerts))),
+      renderText(paste0("Number of potential errors detected: ", as.character(report()$n.a.alerts))),
       tags$br()
     )
   })
@@ -61,7 +61,7 @@ server <- function(input, output) {
       contentType = "text/csv"
     )
     
-    downloadButton("downloadErrorsHandler", "Download the spreadsheet of potential errors")
+    downloadButton("downloadErrorsHandler", "Errors detected? Download a list of suspected issues here.")
   })
 }
 
