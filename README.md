@@ -16,7 +16,7 @@ It is up to you humans to fix those as needed! This is just a tool to help annot
 3. Go to [https://aclew.shinyapps.io/AAS-minCHAT-Checker/]()
 4. Upload the file and click **Submit**
 5. Download the spreadsheet of possible errors detected; remember, this tool finds potential errors—it is your job to determine whether there are real errors!
-6. Please report any problems you encounter as issues on the tool repository ([https://github.com/aclew/AAS-minCHAT-Checker/issues]()). When filing an issue, please provide a link to the _exact_ input files you are using as well as a detailed explanation of the problem you encountered. Otherwise we might not be able to re-create the problem and fix it!
+6. Problems? See Error Reporting below.
 
 _Figure 1._ Select all tiers and make sure your time column settings are set up as shown below. When prompted about format type for export, select UTF-8.
 
@@ -48,3 +48,5 @@ _Figure 1._ Select all tiers and make sure your time column settings are set up 
 * matching speaker names across related tiers
 * inner tier structure (i.e., correct hierarchical set-up)
   
+## Error reporting
+Please report any problems you encounter. You can file them under the issues tab of this tool's github repository ([https://github.com/aclew/AAS-minCHAT-Checker/issues]()). When filing an issue, please provide a link to the _exact_ input files you were using as well as a detailed explanation of the problem you encountered. Otherwise we might not be able to re-create the problem and fix it!
