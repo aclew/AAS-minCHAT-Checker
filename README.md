@@ -11,11 +11,12 @@ It is up to you humans to fix those as needed! This is just a tool to help annot
 
 
 ## Instructions
-0. Locate the .eaf file you want to check; it will *not* work to just right-click a single eaf and save-as in github. Clone (recommended) or downloaded (not ideal but will work) the whole zip folder where the eafs you want live. Please make sure to use the right version of your eaf files (i.e. the github version in rely_XXX or raw_XXX)
-1. Export the .eaf file you want to check as a tab-delimited text (File > Export As > Tab-delimited text)
-2. Go to https://aclew.shinyapps.io/AAS-minCHAT-Checker/
-3. Upload the file and click Submit
+0. Locate the .eaf file you want to check; to ensure that you are using the most recent version of your files, clone (recommended) or download the directory of eafs you want to analyze from our shared ACLEW github repo (i.e. rely_XXX or raw_XXX).
+1. Export the .eaf file you want to check as a tab-delimited text (File > Export As > Tab-delimited text; make sure all tiers are selected)
+2. Go to [https://aclew.shinyapps.io/AAS-minCHAT-Checker/]()
+3. Upload the file and click Update
 4. Download the spreadsheet of possible errors detected
+5. Report an errors as issues on this repository: [https://github.com/aclew/AAS-minCHAT-Checker/issues]()
 
 ## What does it look for? It checks to see whether...
 
