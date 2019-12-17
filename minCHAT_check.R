@@ -56,6 +56,8 @@ check.annotations <- function(annfile, nameannfile) {
       value = value))
   }
   
+  legal.tier.names <- "(^[a-z]{3}@[A-Z]{2}\\d{1}$)|(^[a-z]{3}@CHI$)|(^[A-Z]{2}\\d{1}$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)"
+  
   ##########
   
 #  for (annfile in filebatch) {
@@ -74,13 +76,14 @@ check.annotations <- function(annfile, nameannfile) {
     
     #-- correct tier names --#
     # check if the tier name is either 3 or 7 characters
+  
     bad.format.tier.names <- unique(annots$tier[which(
-      !grepl("(^[a-z]{3}@[A-Z]{2}\\d{1}$)|(^[a-z]{3}@CHI$)|(^[A-Z]{2}\\d{1}$)|(^CHI$)",
-             annots$tier))])
+      !grepl(legal.tier.names, annots$tier))])
     if (length(bad.format.tier.names) > 0) {
       alert.table <- add_alert(filename,
         paste0("wrong format tier name(s): ",
-               paste(bad.format.tier.names, collapse = " ")), NA, NA, NA, NA)
+               paste(
+                 bad.format.tier.names, collapse = " ")), NA, NA, NA, NA)
     }
     # if the pre- or post-fixes don't match one of the limited types
     tier.names <- unique(unlist(strsplit(annots$tier[which(grepl("@", annots$tier))], "@")))
@@ -103,7 +106,8 @@ check.annotations <- function(annfile, nameannfile) {
       # number of annotations as there are in the CHI tier
       if (TRUE %in% grepl("vcm", annots$tier)) {
         if (filter(annots, tier == "vcm@CHI") %>% nrow() != n.CHI) {
-          alert.table <- add_alert(filename, "1+ missing VCM annotations", NA, NA, NA, NA)
+          alert.table <- add_alert(
+            filename, "1+ missing VCM annotations", NA, NA, NA, NA)
         }
         n_cb <- filter(annots, tier == "vcm@CHI" &
                          value == "C") %>% nrow()
@@ -119,19 +123,22 @@ check.annotations <- function(annfile, nameannfile) {
             # if so, check if there is a matching number of MWU codes
             # for each babble with words
             if (n_lx != nrow(filter(annots, tier == "lex@CHI"))) {
-              alert.table <- add_alert(filename,
-                                       "possible missing MWU annotations when LEX = 'W'",
-                                       NA, NA, NA, NA)
+              alert.table <- add_alert(
+                filename,
+                "possible missing MWU annotations when LEX = 'W'",
+                NA, NA, NA, NA)
             }
           } else {
-            alert.table <- add_alert(filename,
-                                     "possible missing LEX annotations when VCM = 'C'; re-check MWU too, if relevant",
-                                     NA, NA, NA, NA)
+            alert.table <- add_alert(
+              filename,
+              "possible missing LEX annotations when VCM = 'C'; re-check MWU too, if relevant",
+              NA, NA, NA, NA)
           }
         } else {
           if (nrow(filter(annots, tier == "lex@CHI")) > 0 || nrow(filter(annots, tier == "mwu@CHI")) > 0) {
-            alert.table <- add_alert(filename,
-                                     "too many LEX/MWU annotations", NA, NA, NA, NA)
+            alert.table <- add_alert(
+              filename,
+              "too many LEX/MWU annotations", NA, NA, NA, NA)
           }
         }
       } else {
@@ -148,29 +155,33 @@ check.annotations <- function(annfile, nameannfile) {
             # check if there is a matching number of MWU codes
             # for each babble with words
             if (n_lx != nrow(filter(annots, tier == "lex@CHI"))) {
-              alert.table <- add_alert(filename,
-                                       "missing MWU annotations when LEX = 'W'",
-                                       NA, NA, NA, NA)
+              alert.table <- add_alert(
+                filename,
+                "missing MWU annotations when LEX = 'W'",
+                NA, NA, NA, NA)
             }
           } else {
             if (nrow(filter(annots, tier == "mwu@CHI")) > 0) {
-              alert.table <- add_alert(filename,
-                                       "too many MWU annotations",
-                                       NA, NA, NA, NA)
+              alert.table <- add_alert(
+                filename,
+                "too many MWU annotations",
+                NA, NA, NA, NA)
             }
           }
         } else {
-          alert.table <- add_alert(filename,
-                                   "missing LEX or VCM tier",
-                                   NA, NA, NA, NA)
+          alert.table <- add_alert(
+            filename,
+            "missing LEX or VCM tier",
+            NA, NA, NA, NA)
         }
       }
     }
     # check whether there are the same number of xds annotations as
     # non-CHI vocalizations
-    if (filter(annots, tier != "CHI") %>% nrow() !=
+    if (filter(annots, !grepl("(CHI)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^xds@)", tier)) %>% nrow() !=
         filter(annots, grepl("xds@", tier)) %>% nrow()) {
-      alert.table <- add_alert(filename,
+      alert.table <- add_alert(
+        filename,
         "missing XDS annotations; compare the # of utterances with the # of XDS annotations for each speaker",
         NA, NA, NA, NA)
     }
@@ -256,7 +267,8 @@ check.annotations <- function(annfile, nameannfile) {
     # and improvements would be most welcome
     utts <- filter(annots, tier == speaker)
     # check for utterances without transcription
-    empty.utts <- filter(utts, (grepl("^[\\s[[:punct:]]]*$", value) | is.na(value))) %>%
+    empty.utts <- filter(utts,
+      (grepl("^[\\s[[:punct:]]]*$", value) | is.na(value))) %>%
       select(onset, offset, tier, value) %>%
       mutate(filename = filename,
              alert = "empty transcription") %>%
@@ -309,9 +321,10 @@ check.annotations <- function(annfile, nameannfile) {
       filter(alert != "okay") %>%
       select(filename, alert, onset, offset, tier, value)
     # add open transcription alerts to table
-    alert.table <- bind_rows(alert.table,
-                             empty.utts, nonterminating.utts, overterminating.utts,
-                             squarebrace.utts, atsign.utts)
+    alert.table <- bind_rows(
+      alert.table,
+      empty.utts, nonterminating.utts, overterminating.utts,
+      squarebrace.utts, atsign.utts)
     
     # convert msec times to HHMMSS
     alert.table <- alert.table %>%
@@ -319,20 +332,6 @@ check.annotations <- function(annfile, nameannfile) {
       mutate(start = convert_ms_to_hhmmssms(onset),
              stop = convert_ms_to_hhmmssms(offset)) %>%
       select(-onset, -offset)
-  
-    # short list of known error types that this script doesn't check:
-    # - spelling... anywhere
-    # - &=verbs (neither the &= nor the use of present 3ps tense)
-    # - [=! verbs] (checks the bracket syntax, but not the use of present 3ps tense)
-    # - xxx vs. yyy
-    # - the use of capital letters
-    # - the use of conventionally spelled expressive words (e.g., mm-hm)
-    # - extra spaces
-    # - uses of hyphens and ampersands to indicate cut-off/restarted speech (e.g., he-, -in)
-    # - the use of things like [+ CHI], that were in some of the ROS files
-    # - matching speaker names across related tiers
-    # - inner tier structure (i.e., correct hierarchical set-up)
-  
 #  }
       
     return(list(
