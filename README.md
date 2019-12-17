@@ -11,12 +11,12 @@ It is up to you humans to fix those as needed! This is just a tool to help annot
 
 
 ## Instructions
-1. Locate the .eaf file you want to check; to ensure that you are using the most recent version of your files, clone (recommended) or download the directory of eafs you want to analyze from our shared ACLEW github repo (i.e. rely_XXX or raw_XXX).
+1. Locate the .eaf file you want to check; to ensure that you are using the most recent version of your files, clone (recommended) or download the directory of eafs you want to analyze from our shared ACLEW github repo (i.e. rely\_XXX or raw\_XXX).
 2. Export the .eaf file you want to check as a tab-delimited text (File > Export As > Tab-delimited text; make sure all tiers are selected); see Figure 1 below.
 3. Go to [https://aclew.shinyapps.io/AAS-minCHAT-Checker/]()
-4. Upload the file and click Update
-5. Download the spreadsheet of possible errors detected
-6. Report an errors as issues on this repository: [https://github.com/aclew/AAS-minCHAT-Checker/issues]()
+4. Upload the file and click **Submit**
+5. Download the spreadsheet of possible errors detected; remember, this tool finds potential errors—it is your job to determine whether there are real errors!
+6. Please report any problems you encounter as issues on the tool repository ([https://github.com/aclew/AAS-minCHAT-Checker/issues]()). When filing an issue, please provide a link to the _exact_ input files you are using as well as a detailed explanation of the problem you encountered. Otherwise we might not be able to re-create the problem and fix it!
 
 _Figure 1._ Select all tiers and make sure your time column settings are set up as shown below. When prompted about format type for export, select UTF-8.
 

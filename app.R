@@ -19,7 +19,7 @@ ui <- fluidPage(
                          ".txt")),
 
       # Submit button:
-      actionButton("submit", "Update")
+      actionButton("submit", "Submit")
     ),
     
     # Main panel for displaying outputs ----
