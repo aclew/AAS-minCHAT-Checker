@@ -56,17 +56,57 @@ check.annotations <- function(annfile, nameannfile) {
       value = value))
   }
   
+  check_minCHATspclchr <- function(utt, minCHATspclchr) {
+    if (minCHATspclchr == "squarebraces") {
+      utterance <- gsub(
+        "<[[:alnum:] ,.!?-_'@]+> _bb_",
+        "_aa_",
+        gsub(
+          "(\\[: [[:alnum:] ]+\\])|(\\[=! [[:alnum:] ]+\\])",
+          "_bb_",
+          gsub(
+            "(\\[- [[:alnum:]]{3}\\])",
+            "_lg_",
+            utt,
+            perl = TRUE),
+          perl = TRUE),
+        perl = TRUE)
+      # and now in case of <<xxx> [xxx]> [xxx] double embeddings...
+      if (grepl("<_aa_> _bb_", utterance)) {
+        utterance <- gsub("<_aa_> _bb_", "_aa_", utterance)
+      }
+      utterance <- gsub("(_aa_)|(^_lg_)", "", utterance)
+      if (grepl("([][<>])|(_bb_)|(_aa_)|(_lg_)", utterance)) {
+        return("incorrect use of square braces")
+      } else {
+        return("okay")
+      }
+    } else if (minCHATspclchr == "atsign") {
+      utterance <- gsub(
+        "([[:alnum:]]+@s\\:[a-z]{3}[ ,.!?-])|([[:alnum:]]+@[lc])",
+        "atat",
+        utt)
+      if (grepl("@", utterance)) {
+        return("incorrect use of @ sign")
+      } else {
+        return("okay")
+      }
+    } else {
+      return("ERROR: contact app developer")
+    }
+  }
+  
   legal.tier.names <- "(^[a-z]{3}@[A-Z]{2}\\d{1}$)|(^[a-z]{3}@CHI$)|(^[A-Z]{2}\\d{1}$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)"
   
   ##########
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE,
+  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/example3.txt"
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1]
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "example3.txt"
 #  filename <- as.character(annfile)
   
     
@@ -83,7 +123,8 @@ check.annotations <- function(annfile, nameannfile) {
       alert.table <- add_alert(filename,
         paste0("wrong format tier name(s): ",
                paste(
-                 bad.format.tier.names, collapse = " ")), NA, NA, NA, NA)
+                 bad.format.tier.names, collapse = " ")),
+        min(annots$onset), max(annots$offset), "", "")
     }
     # if the pre- or post-fixes don't match one of the limited types
     tier.names <- unique(unlist(strsplit(annots$tier[which(grepl("@", annots$tier))], "@")))
@@ -94,7 +135,8 @@ check.annotations <- function(annfile, nameannfile) {
       alert.table <- add_alert(filename,
         paste0("illegal tier prefix(es) or speaker name(s) (may overlap with wrong format): ",
                paste(unique(tier.names[which(name.part.matches == FALSE)]),
-                     collapse = " ")), NA, NA, NA, NA)
+                     collapse = " ")),
+        min(annots$onset), max(annots$offset), "", "")
     }
     
     
@@ -107,7 +149,8 @@ check.annotations <- function(annfile, nameannfile) {
       if (TRUE %in% grepl("vcm", annots$tier)) {
         if (filter(annots, tier == "vcm@CHI") %>% nrow() != n.CHI) {
           alert.table <- add_alert(
-            filename, "1+ missing VCM annotations", NA, NA, NA, NA)
+            filename, "1+ missing VCM annotations",
+            min(annots$onset), max(annots$offset), "", "")
         }
         n_cb <- filter(annots, tier == "vcm@CHI" &
                          value == "C") %>% nrow()
@@ -126,19 +169,20 @@ check.annotations <- function(annfile, nameannfile) {
               alert.table <- add_alert(
                 filename,
                 "possible missing MWU annotations when LEX = 'W'",
-                NA, NA, NA, NA)
+                min(annots$onset), max(annots$offset), "", "")
             }
           } else {
             alert.table <- add_alert(
               filename,
               "possible missing LEX annotations when VCM = 'C'; re-check MWU too, if relevant",
-              NA, NA, NA, NA)
+              min(annots$onset), max(annots$offset), "", "")
           }
         } else {
           if (nrow(filter(annots, tier == "lex@CHI")) > 0 || nrow(filter(annots, tier == "mwu@CHI")) > 0) {
             alert.table <- add_alert(
               filename,
-              "too many LEX/MWU annotations", NA, NA, NA, NA)
+              "too many LEX/MWU annotations",
+              min(annots$onset), max(annots$offset), "", "")
           }
         }
       } else {
@@ -158,34 +202,50 @@ check.annotations <- function(annfile, nameannfile) {
               alert.table <- add_alert(
                 filename,
                 "missing MWU annotations when LEX = 'W'",
-                NA, NA, NA, NA)
+                min(annots$onset), max(annots$offset), "", "")
             }
           } else {
             if (nrow(filter(annots, tier == "mwu@CHI")) > 0) {
               alert.table <- add_alert(
                 filename,
                 "too many MWU annotations",
-                NA, NA, NA, NA)
+                min(annots$onset), max(annots$offset), "", "")
             }
           }
         } else {
           alert.table <- add_alert(
             filename,
             "missing LEX or VCM tier",
-            NA, NA, NA, NA)
+            min(annots$onset), max(annots$offset), "", "")
         }
       }
     }
     # check whether there are the same number of xds annotations as
     # non-CHI vocalizations
-    if (filter(annots, !grepl("(CHI)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^xds@)", tier)) %>% nrow() !=
-        filter(annots, grepl("xds@", tier)) %>% nrow()) {
+    nonCHI.vocs <- annots %>%
+      filter(!grepl("(CHI)|(^context$)|(^code_num$)|(^code$)|(^notes$)", tier)) %>%
+      group_by(tier, speaker) %>%
+      summarize(nvocs = n()) %>%
+      ungroup() %>%
+      mutate(tier = case_when(
+        grepl("^xds@", tier) ~ "xds.vocs",
+        TRUE ~ "spkr.vocs"
+      )) %>%
+      group_by(speaker) %>%
+      spread(tier, nvocs, drop = FALSE) %>%
+      mutate(match = spkr.vocs == xds.vocs) %>%
+      filter(match == FALSE) %>%
+      pull(speaker)
+    if (length(nonCHI.vocs) > 0) {
+      nonCHI.vocs.str <- paste0(nonCHI.vocs, collapse = ", ")
+      alert.xds <- paste0(
+        "missing XDS annotations; compare the # of utterances with the # of XDS annotations for ",
+        nonCHI.vocs.str)
       alert.table <- add_alert(
         filename,
-        "missing XDS annotations; compare the # of utterances with the # of XDS annotations for each speaker",
-        NA, NA, NA, NA)
+        alert.xds,
+        min(annots$onset), max(annots$offset), "", "")
     }
-  
   
     #-- invalid annotation values: closed vocabulary --#
     # check XDS values
@@ -280,9 +340,9 @@ check.annotations <- function(annfile, nameannfile) {
              alert = "no utterance terminator") %>%
       select(filename, alert, onset, offset, tier, value)
     # check for the presence of multiple terminal marks in the utterance
-    utts.nopauses <- gsub(" \\(\\.*\\)", "", utts$value)
-    utts.nosqbrackets <- gsub("\\[.*?\\]", "", utts.nopauses)
-    utts$value.mod <- utts.nosqbrackets
+    utts.nopausessqbrackets <- gsub("\\[.*?\\]", "",
+      gsub(" \\(\\.*\\)", "", utts$value))
+    utts$value.mod <- utts.nopausessqbrackets
     overterminating.utts <- utts %>%
       mutate(
       n_terms = str_count(value.mod, "[.!?]"),
@@ -290,41 +350,35 @@ check.annotations <- function(annfile, nameannfile) {
       alert = "2+ utterance terminators") %>%
       filter(n_terms > 1) %>%
       select(filename, alert, onset, offset, tier, value)
-    # check for matching square bracket types
-    squarebrace.utts <- filter(utts, grepl("[[]", value)) %>%
+
+    # check for uses of square bracket expressions
+    squarebrace.errs <- filter(utts, grepl("[[]", value)) %>%
       select(onset, offset, tier, value) %>%
-      mutate(filename = filename,
-             alert = case_when(
-        # correctly formatted example: "[: word]"
-        grepl("\\[\\: [[:alnum:]]+.*\\]", value) ~ "okay",
-        # correctly formatted example: "<word> [=! word]"
-        grepl("<[[:alnum:]]+.*> \\[=! [[:alnum:]]+.*\\]", value) ~ "okay",
-        # correctly formatted example: "[- lng]"
-        grepl("\\[- [[:alnum:]]{3}\\]", value) ~ "okay",
-        TRUE ~ "incorrect use of square and/or angle braces"
-      )) %>%
-      filter(alert != "okay") %>%
-      select(filename, alert, onset, offset, tier, value)
+      rowwise() %>%
+      mutate(alert.sq = check_minCHATspclchr(value, "squarebraces")) %>%
+      filter(alert.sq != "okay")
     # check for uses of @
-    atsign.utts <- filter(utts, grepl("@", value)) %>%
+    atsign.errs <- filter(utts, grepl("@", value)) %>%
       select(onset, offset, tier, value) %>%
-      mutate(filename = filename,
-             alert = case_when(
-        # correctly formatted example: "word@s:eng"
-        grepl("[[:alnum:]]+@s\\:[a-z]{3}[ ,.!?]", value) ~ "okay",
-        # correctly formatted example: "word@l"
-        grepl("[[:alnum:]]+@l[ ,.!?]", value) ~ "okay",
-        # correctly formatted example: "word@c"
-        grepl("[[:alnum:]]+@c[ ,.!?]", value) ~ "okay",
-        TRUE ~ "incorrect use of @ sign in transcription"
-      )) %>%
-      filter(alert != "okay") %>%
+      rowwise() %>%
+      mutate(alert.at = check_minCHATspclchr(value, "atsign")) %>%
+      filter(alert.at != "okay")
+    spchchr.errs <- full_join(squarebrace.errs, atsign.errs) %>%
+      mutate(
+        filename = filename,
+        alert = case_when(
+          is.na(alert.sq) & is.na(alert.at) ~ "okay",
+          is.na(alert.sq) & !is.na(alert.at) ~ alert.at,
+          !is.na(alert.sq) & is.na(alert.at) ~ alert.sq,
+          !is.na(alert.sq) & !is.na(alert.at) ~ paste0(
+            alert.at, " and ", alert.sq))) %>%
       select(filename, alert, onset, offset, tier, value)
+
     # add open transcription alerts to table
     alert.table <- bind_rows(
       alert.table,
       empty.utts, nonterminating.utts, overterminating.utts,
-      squarebrace.utts, atsign.utts)
+      spchchr.errs)
     
     # convert msec times to HHMMSS
     if (nrow(alert.table) > 0) {
