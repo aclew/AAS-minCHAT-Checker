@@ -380,7 +380,23 @@ check.annotations <- function(annfile, nameannfile) {
       empty.utts, nonterminating.utts, overterminating.utts,
       spchchr.errs)
     
-    # convert msec times to HHMMSS
+    # List capitalized words found
+    capitalwords.used <- tibble(
+      word = sort(unique(unlist(
+        regmatches(paste0(" ", utts$value, collapse = " "),
+          gregexpr(" [A-Z][A-Za-z@_]*", all.utts.together)))))
+      ) %>%
+      mutate(word = trimws(word))
+
+    # List of hyphenated words found
+    hyphenwords.used <- tibble(
+      word = sort(unique(unlist(
+        regmatches(paste0(" ", utts$value, collapse = " "),
+          gregexpr("[A-Za-z]+-[A-Za-z]+", all.utts.together)))))
+    ) %>%
+      mutate(word = trimws(word))
+    
+    # convert msec times to HHMMSS and return assessment
     if (nrow(alert.table) > 0) {
       alert.table <- alert.table %>%
         rowwise() %>%
@@ -389,7 +405,11 @@ check.annotations <- function(annfile, nameannfile) {
         select(-onset, -offset)
       return(list(
         alert.table = alert.table,
-        n.a.alerts = nrow(alert.table)
+        n.a.alerts = nrow(alert.table),
+        capitals = capitalwords.used,
+        n.capitals = nrow(capitalwords.used),
+        hyphens = hyphenwords.used,
+        n.hyphens = nrow(hyphenwords.used)
       ))
     } else {
         alert.table.NA = tibble(
@@ -398,7 +418,11 @@ check.annotations <- function(annfile, nameannfile) {
         )
         return(list(
           alert.table = alert.table.NA,
-          n.a.alerts = 0
+          n.a.alerts = 0,
+          capitals = capitalwords.used,
+          n.capitals = nrow(capitalwords.used),
+          hyphens = hyphenwords.used,
+          n.hyphens = nrow(hyphenwords.used)
         ))
     }
 #  }
