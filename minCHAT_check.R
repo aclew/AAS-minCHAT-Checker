@@ -102,11 +102,11 @@ check.annotations <- function(annfile, nameannfile) {
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/example3.txt"
+  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/example2.txt"
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "example3.txt"
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "example2.txt"
 #  filename <- as.character(annfile)
   
     
@@ -223,7 +223,7 @@ check.annotations <- function(annfile, nameannfile) {
     # check whether there are the same number of xds annotations as
     # non-CHI vocalizations
     nonCHI.vocs <- annots %>%
-      filter(!grepl("(CHI)|(^context$)|(^code_num$)|(^code$)|(^notes$)", tier)) %>%
+      filter(grepl("(^[A-Z]{2}\\d{1}$)|(^xds@[A-Z]{2}\\d{1}$)", tier)) %>%
       group_by(tier, speaker) %>%
       summarize(nvocs = n()) %>%
       ungroup() %>%
