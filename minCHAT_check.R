@@ -59,7 +59,7 @@ check.annotations <- function(annfile, nameannfile) {
   check_minCHATspclchr <- function(utt, minCHATspclchr) {
     if (minCHATspclchr == "squarebraces") {
       utterance <- gsub(
-        "<[[:alnum:] ,.!?-_'@]+> _bb_",
+        "<[[:alnum:] ,.!?-_'@&=]+> _bb_",
         "_aa_",
         gsub(
           "(\\[: [[:alnum:] ,.!?-_'@]+\\])|(\\[=! [[:alnum:]]+\\])",
@@ -72,7 +72,7 @@ check.annotations <- function(annfile, nameannfile) {
           perl = TRUE),
         perl = TRUE)
       # and now in case of <<xxx> [xxx]> [xxx] double embeddings...
-      embedded.braces.pattern <- "<[[:alnum:] ,.!?-_'@]*_aa_[[:alnum:] ,.!?-_'@]*> _bb_"
+      embedded.braces.pattern <- "<[[:alnum:] ,.!?-_'@&=]*_aa_[[:alnum:] ,.!?-_'@&=]*> _bb_"
       if (grepl(embedded.braces.pattern, utterance)) {
         utterance <- gsub(embedded.braces.pattern, "", utterance)
       }
