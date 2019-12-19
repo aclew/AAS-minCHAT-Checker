@@ -102,11 +102,11 @@ check.annotations <- function(annfile, nameannfile) {
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/1196.txt"
+  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/rely_9527.txt"
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "1196.txt"
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "rely_9527.txt"
 #  filename <- as.character(annfile)
   
     
@@ -387,20 +387,25 @@ check.annotations <- function(annfile, nameannfile) {
       spchchr.errs)
     
     # List capitalized words found
+    no.na.utts <- filter(utts, !is.na(value))
+    all.utts.together <- paste0(
+      " ", no.na.utts$value, collapse = " ")
     capitalwords.used <- tibble(
-      word = sort(unique(unlist(
-        regmatches(paste0(" ", utts$value, collapse = " "),
-          gregexpr(" [A-Z][A-Za-z@_]*", all.utts.together)))))
-      ) %>%
-      mutate(word = trimws(word))
+      `capitalized words` = sort(unique(unlist(
+        regmatches(all.utts.together,
+          gregexpr(" [A-Z][A-Za-z@_]*",
+            all.utts.together)))))) %>%
+      mutate(`capitalized words` = trimws(
+        `capitalized words`))
 
     # List of hyphenated words found
     hyphenwords.used <- tibble(
-      word = sort(unique(unlist(
-        regmatches(paste0(" ", utts$value, collapse = " "),
-          gregexpr("[A-Za-z]+-[A-Za-z]+", all.utts.together)))))
-    ) %>%
-      mutate(word = trimws(word))
+      `hyphenated words` = sort(unique(unlist(
+        regmatches(all.utts.together,
+          gregexpr("[A-Za-z]+-[A-Za-z]+",
+            all.utts.together)))))) %>%
+      mutate(`hyphenated words` = trimws(
+        `hyphenated words`))
     
     # convert msec times to HHMMSS and return assessment
     if (nrow(alert.table) > 0) {

@@ -24,7 +24,9 @@ ui <- fluidPage(
     # Main panel for displaying outputs ----
     mainPanel(
       uiOutput("report"),
-      uiOutput("downloadErrors")
+      uiOutput("downloadErrors"),
+      uiOutput("capitalizedwords"),
+      uiOutput("hyphenatedwords")
     )
   )
 )
@@ -41,7 +43,17 @@ server <- function(input, output) {
     
     tagList(
       tags$br(),
-      renderText(paste0("Number of potential errors detected: ", as.character(report()$n.a.alerts))),
+      renderText(paste0("Number of potential errors detected: ",
+        as.character(report()$n.a.alerts))),
+      renderText("(downloadable list below)"),
+      tags$br(),
+      renderText(paste0("Number of capitalized word types detected: ",
+        as.character(report()$n.capitals))),
+      renderTable(report()$capitals),
+      tags$br(),
+      renderText(paste0("Number of hyphenated word types detected: ",
+        as.character(report()$n.hyphens))),
+      renderTable(report()$hyphens),
       tags$br()
     )
   })
