@@ -5,9 +5,9 @@ account: aclew
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 902825
-bundleId: 2681032
+bundleId: 2681103
 url: https://aclew.shinyapps.io/AAS-minCHAT-Checker/
-when: 1576765943.84541
+when: 1576767924.52167
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: .RData|ChangePtcpInfo-screenshot.png|EAF2TXT-screenshot.png|ptcpfilledin-screenshot.png|ptcpmissing-screenshot.png|README.md|utils/eaf2txt_general.py|utils/Elan.py|utils/README.md|input_files

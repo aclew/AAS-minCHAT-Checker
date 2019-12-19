@@ -113,11 +113,11 @@ check.annotations <- function(annfile, nameannfile) {
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/example1.txt"
+  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/rely_1499.txt"
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "example1.txt"
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "rely_14991.txt"
 #  filename <- as.character(annfile)
   
     
@@ -370,38 +370,52 @@ check.annotations <- function(annfile, nameannfile) {
 
     # check for uses of square bracket expressions
     squarebrace.errs <- filter(utts, grepl("[[]", value)) %>%
-      select(onset, offset, tier, value) %>%
-      rowwise() %>%
-      mutate(alert.sq = check_minCHATspclchr(value, "squarebraces")) %>%
-      filter(alert.sq != "okay")
+      select(onset, offset, tier, value)
+    if (nrow(squarebrace.errs) > 0) {
+      squarebrace.errs <- squarebrace.errs %>%
+        rowwise() %>%
+        mutate(alert.sq = check_minCHATspclchr(value, "squarebraces")) %>%
+        filter(alert.sq != "okay")
+    }
     # check for uses of @
     atsign.errs <- filter(utts, grepl("@", value)) %>%
-      select(onset, offset, tier, value) %>%
-      rowwise() %>%
-      mutate(alert.at = check_minCHATspclchr(value, "atsign")) %>%
-      filter(alert.at != "okay")
+      select(onset, offset, tier, value)
+    if (nrow(atsign.errs) > 0) {
+      atsign.errs <- atsign.errs %>%
+        rowwise() %>%
+        mutate(alert.at = check_minCHATspclchr(value, "atsign")) %>%
+        filter(alert.at != "okay")
+    }
     # check for uses of &
     ampsnd.errs <- filter(utts, grepl("&", value)) %>%
-      select(onset, offset, tier, value) %>%
-      rowwise() %>%
-      mutate(alert.am = check_minCHATspclchr(value, "ampersand")) %>%
-      filter(alert.am != "okay")
+      select(onset, offset, tier, value)
+    if (nrow(ampsnd.errs) > 0) {
+      ampsnd.errs <- ampsnd.errs %>%
+        rowwise() %>%
+        mutate(alert.am = check_minCHATspclchr(value, "ampersand")) %>%
+        filter(alert.am != "okay")
+    }
     spchchr.errs <- full_join(squarebrace.errs, atsign.errs) %>%
-      full_join(ampsnd.errs) %>%
-      mutate(
-        filename = filename,
-        alert = case_when(
-          is.na(alert.sq) & is.na(alert.at) ~ "okay",
-          is.na(alert.sq) & !is.na(alert.at) ~ alert.at,
-          !is.na(alert.sq) & is.na(alert.at) ~ alert.sq,
-          !is.na(alert.sq) & !is.na(alert.at) ~ paste0(
-            alert.at, " and ", alert.sq))) %>%
-      select(filename, alert, onset, offset, tier, value)
+      full_join(ampsnd.errs)
+    if (nrow(spchchr.errs) > 0) {
+      spchchr.errs <- spchchr.errs %>%
+        mutate(
+          filename = filename,
+          alert = case_when(
+            is.na(alert.sq) & is.na(alert.at) ~ "okay",
+            is.na(alert.sq) & !is.na(alert.at) ~ alert.at,
+            !is.na(alert.sq) & is.na(alert.at) ~ alert.sq,
+            !is.na(alert.sq) & !is.na(alert.at) ~ paste0(
+              alert.at, " and ", alert.sq))) %>%
+        select(filename, alert, onset, offset, tier, value)
+    }
 
     # add open transcription alerts to table
     alert.table <- bind_rows(
       alert.table,
-      empty.utts, nonterminating.utts, overterminating.utts,
+      empty.utts,
+      nonterminating.utts,
+      overterminating.utts,
       spchchr.errs)
     
     # List capitalized words found
