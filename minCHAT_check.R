@@ -62,7 +62,7 @@ check.annotations <- function(annfile, nameannfile) {
         "<[[:alnum:] ,.!?-_'@]+> _bb_",
         "_aa_",
         gsub(
-          "(\\[: [[:alnum:] ]+\\])|(\\[=! [[:alnum:] ]+\\])",
+          "(\\[: [[:alnum:] ,.!?-_'@]+\\])|(\\[=! [[:alnum:]]+\\])",
           "_bb_",
           gsub(
             "(\\[- [[:alnum:]]{3}\\])",
@@ -228,7 +228,8 @@ check.annotations <- function(annfile, nameannfile) {
     # check whether there are the same number of xds annotations as
     # non-CHI vocalizations
     nonCHI.vocs <- annots %>%
-      filter(grepl("(^[A-Z]{2}\\d{1}$)|(^xds@[A-Z]{2}\\d{1}$)", tier)) %>%
+      filter(grepl(
+        "(^[A-Z]{2}\\d{1}$)|(^xds@[A-Z]{2}\\d{1}$)", tier)) %>%
       group_by(tier, speaker) %>%
       summarize(nvocs = n()) %>%
       ungroup() %>%
