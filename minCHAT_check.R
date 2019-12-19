@@ -92,22 +92,32 @@ check.annotations <- function(annfile, nameannfile) {
       } else {
         return("okay")
       }
+    } else if (minCHATspclchr == "ampersand") {
+      utterance <- gsub(
+        "(&=[[:alnum:]]+)|(&[[:alnum:]_'@-]+)|([[:alnum:]_'@-]+&)",
+        "mpmp",
+        utt)
+      if (grepl("&", utterance)) {
+        return("incorrect use of & sign")
+      } else {
+        return("okay")
+      }
     } else {
       return("ERROR: contact app developer")
     }
   }
   
-  legal.tier.names <- "(^[a-z]{3}@[A-Z]{2}\\d{1}$)|(^[a-z]{3}@CHI$)|(^[A-Z]{2}\\d{1}$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^on_off)"
+  legal.tier.names <- "(^xds@[FMU][ACU](\\d{1}|E)$)|(^xds@EE1$)|(^(vcm|lex|mwu)@CHI$)|(^[FMU][ACU](\\d{1}|E)$)|(^EE1$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^on_off)"
   
   ##########
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/rely_9527.txt"
+  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/example1.txt"
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "rely_9527.txt"
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "example1.txt"
 #  filename <- as.character(annfile)
   
     
@@ -130,7 +140,7 @@ check.annotations <- function(annfile, nameannfile) {
     # if the pre- or post-fixes don't match one of the limited types
     tier.names <- unique(unlist(strsplit(annots$tier[which(grepl("@", annots$tier))], "@")))
     name.part.matches <- tier.names %in% c("vcm", "lex", "mwu", "xds") |
-         grepl("[A-Z]{2}\\d{1}", tier.names) |
+         grepl("([FMU][ACU](\\d{1}|E))|(EE1)", tier.names) |
          grepl("^CHI$", tier.names)
     if (FALSE %in% name.part.matches) {
       alert.table <- add_alert(filename,
@@ -370,7 +380,14 @@ check.annotations <- function(annfile, nameannfile) {
       rowwise() %>%
       mutate(alert.at = check_minCHATspclchr(value, "atsign")) %>%
       filter(alert.at != "okay")
+    # check for uses of &
+    ampsnd.errs <- filter(utts, grepl("&", value)) %>%
+      select(onset, offset, tier, value) %>%
+      rowwise() %>%
+      mutate(alert.am = check_minCHATspclchr(value, "ampersand")) %>%
+      filter(alert.am != "okay")
     spchchr.errs <- full_join(squarebrace.errs, atsign.errs) %>%
+      full_join(ampsnd.errs) %>%
       mutate(
         filename = filename,
         alert = case_when(
