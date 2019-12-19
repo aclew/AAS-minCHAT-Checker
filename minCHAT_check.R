@@ -149,7 +149,7 @@ check.annotations <- function(annfile, nameannfile) {
       if (TRUE %in% grepl("vcm", annots$tier)) {
         if (filter(annots, tier == "vcm@CHI") %>% nrow() != n.CHI) {
           alert.table <- add_alert(
-            filename, "1+ missing VCM annotations",
+            filename, "incorrect number of VCM annotations",
             min(annots$onset), max(annots$offset), "", "")
         }
         n_cb <- filter(annots, tier == "vcm@CHI" &
@@ -165,23 +165,26 @@ check.annotations <- function(annfile, nameannfile) {
           if (n_cb == nrow(filter(annots, tier == "lex@CHI"))) {
             # if so, check if there is a matching number of MWU codes
             # for each babble with words
-            if (n_lx != nrow(filter(annots, tier == "lex@CHI"))) {
+            if (n_lx != nrow(filter(annots, tier == "mwu@CHI"))) {
               alert.table <- add_alert(
                 filename,
-                "possible missing MWU annotations when LEX = 'W'",
+                "incorrect number of MWU annotations; should be equal to number of LEX = 'W'",
                 min(annots$onset), max(annots$offset), "", "")
             }
           } else {
             alert.table <- add_alert(
               filename,
-              "possible missing LEX annotations when VCM = 'C'; re-check MWU too, if relevant",
+              "incorrect number of LEX annotations; should be equal to number of VCM = 'C'; re-check MWU too, if relevant",
               min(annots$onset), max(annots$offset), "", "")
           }
         } else {
-          if (nrow(filter(annots, tier == "lex@CHI")) > 0 || nrow(filter(annots, tier == "mwu@CHI")) > 0) {
+          # if the child produced no canonical babbles but there are 
+          # LEX and MWU annots send an alert
+          if (nrow(filter(annots, tier == "lex@CHI")) > 0 ||
+              nrow(filter(annots, tier == "mwu@CHI")) > 0) {
             alert.table <- add_alert(
               filename,
-              "too many LEX/MWU annotations",
+              "too many LEX/MWU annotations because there are no cases of VCM = 'C'",
               min(annots$onset), max(annots$offset), "", "")
           }
         }
@@ -198,17 +201,19 @@ check.annotations <- function(annfile, nameannfile) {
           if (n_lx > 0) {
             # check if there is a matching number of MWU codes
             # for each babble with words
-            if (n_lx != nrow(filter(annots, tier == "lex@CHI"))) {
+            if (n_lx != nrow(filter(annots, tier == "mwu@CHI"))) {
               alert.table <- add_alert(
                 filename,
-                "missing MWU annotations when LEX = 'W'",
+                "incorrect number of MWU annotations; should be equal to number of LEX = 'W'",
                 min(annots$onset), max(annots$offset), "", "")
             }
           } else {
+            # if the child produced no lexical utterances but there are
+            # MWU annots send an alert
             if (nrow(filter(annots, tier == "mwu@CHI")) > 0) {
               alert.table <- add_alert(
                 filename,
-                "too many MWU annotations",
+                "too many MWU annotations because there are no cases of LEX = 'W'",
                 min(annots$onset), max(annots$offset), "", "")
             }
           }
