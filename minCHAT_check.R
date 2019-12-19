@@ -72,8 +72,9 @@ check.annotations <- function(annfile, nameannfile) {
           perl = TRUE),
         perl = TRUE)
       # and now in case of <<xxx> [xxx]> [xxx] double embeddings...
-      if (grepl("<_aa_> _bb_", utterance)) {
-        utterance <- gsub("<_aa_> _bb_", "_aa_", utterance)
+      embedded.braces.pattern <- "<[[:alnum:] ,.!?-_'@]*_aa_[[:alnum:] ,.!?-_'@]*> _bb_"
+      if (grepl(embedded.braces.pattern, utterance)) {
+        utterance <- gsub(embedded.braces.pattern, "", utterance)
       }
       utterance <- gsub("(_aa_)|(^_lg_)", "", utterance)
       if (grepl("([][<>])|(_bb_)|(_aa_)|(_lg_)", utterance)) {
