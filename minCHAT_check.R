@@ -96,17 +96,17 @@ check.annotations <- function(annfile, nameannfile) {
     }
   }
   
-  legal.tier.names <- "(^[a-z]{3}@[A-Z]{2}\\d{1}$)|(^[a-z]{3}@CHI$)|(^[A-Z]{2}\\d{1}$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)"
+  legal.tier.names <- "(^[a-z]{3}@[A-Z]{2}\\d{1}$)|(^[a-z]{3}@CHI$)|(^[A-Z]{2}\\d{1}$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^on_off)"
   
   ##########
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/example2.txt"
+  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/1196.txt"
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "example2.txt"
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "1196.txt"
 #  filename <- as.character(annfile)
   
     
