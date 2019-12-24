@@ -113,11 +113,11 @@ check.annotations <- function(annfile, nameannfile) {
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/rely_1499.txt"
+  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/rely_1735.txt"
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "rely_14991.txt"
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "rely_1735.txt"
 #  filename <- as.character(annfile)
   
     
@@ -398,16 +398,25 @@ check.annotations <- function(annfile, nameannfile) {
     spchchr.errs <- full_join(squarebrace.errs, atsign.errs) %>%
       full_join(ampsnd.errs)
     if (nrow(spchchr.errs) > 0) {
+      if (!("alert.sq" %in% colnames(spchchr.errs))) {
+        spchchr.errs <- spchchr.errs %>%
+          mutate(alert.sq = NA)
+      }
+      if (!("alert.at" %in% colnames(spchchr.errs))) {
+        spchchr.errs <- spchchr.errs %>%
+          mutate(alert.at = NA)
+      }
+      if (!("alert.am" %in% colnames(spchchr.errs))) {
+        spchchr.errs <- spchchr.errs %>%
+          mutate(alert.am = NA)
+      }
       spchchr.errs <- spchchr.errs %>%
         mutate(
           filename = filename,
-          alert = case_when(
-            is.na(alert.sq) & is.na(alert.at) ~ "okay",
-            is.na(alert.sq) & !is.na(alert.at) ~ alert.at,
-            !is.na(alert.sq) & is.na(alert.at) ~ alert.sq,
-            !is.na(alert.sq) & !is.na(alert.at) ~ paste0(
-              alert.at, " and ", alert.sq))) %>%
-        select(filename, alert, onset, offset, tier, value)
+          alert = paste(alert.sq, alert.at, alert.am, sep = ", ")) %>%
+        select(filename, alert, onset, offset, tier, value) %>%
+        mutate(
+          alert = gsub(", NA", "", alert))
     }
 
     # add open transcription alerts to table
