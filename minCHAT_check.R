@@ -111,13 +111,17 @@ check.annotations <- function(annfile, nameannfile) {
   
   ##########
   
+  # debugging
+  # annfile <- "input_files/rely_9398.txt"
+  # nameannfile <- "rely_9398.txt"
+  
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE, # annfile <- "input_files/rely_1735.txt"
+  annots <- read_tsv(annfile, col_names = FALSE,
                      locale = locale(encoding = "UTF-8")) %>%
     rename("tier" = X1, "speaker" = X2, "onset" = X3,
            "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1] # nameannfile <- "rely_1735.txt"
+  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1]
 #  filename <- as.character(annfile)
   
     
@@ -247,13 +251,16 @@ check.annotations <- function(annfile, nameannfile) {
       mutate(tier = case_when(
         grepl("^xds@", tier) ~ "xds.vocs",
         TRUE ~ "spkr.vocs"
-      )) %>%
-      group_by(speaker) %>%
-      spread(tier, nvocs, drop = FALSE) %>%
-      mutate(match = spkr.vocs == xds.vocs) %>%
-      filter(match == FALSE) %>%
-      pull(speaker)
-    if (length(nonCHI.vocs) > 0) {
+      ))
+    if (nrow(nonCHI.vocs) > 0) {
+      nonCHI.vocs <- nonCHI.vocs %>%
+        group_by(speaker) %>%
+        spread(tier, nvocs, drop = FALSE) %>%
+        mutate(match = spkr.vocs == xds.vocs) %>%
+        filter(match == FALSE) %>%
+        pull(speaker)
+    }
+    if (nrow(nonCHI.vocs) > 0) {
       nonCHI.vocs.str <- paste0(nonCHI.vocs, collapse = ", ")
       alert.xds <- paste0(
         "missing XDS annotations; compare the # of utterances with the # of XDS annotations for ",
