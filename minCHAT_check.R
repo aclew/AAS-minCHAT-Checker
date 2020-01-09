@@ -112,8 +112,8 @@ check.annotations <- function(annfile, nameannfile) {
   ##########
   
   # debugging
-  # annfile <- "input_files/rely_9398.txt"
-  # nameannfile <- "rely_9398.txt"
+  # annfile <- "input_files/1499.txt"
+  # nameannfile <- "1499.txt"
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
@@ -259,8 +259,10 @@ check.annotations <- function(annfile, nameannfile) {
         mutate(match = spkr.vocs == xds.vocs) %>%
         filter(match == FALSE) %>%
         pull(speaker)
+    } else {
+      nonCHI.vocs <- c()
     }
-    if (nrow(nonCHI.vocs) > 0) {
+    if (length(nonCHI.vocs) > 0) {
       nonCHI.vocs.str <- paste0(nonCHI.vocs, collapse = ", ")
       alert.xds <- paste0(
         "missing XDS annotations; compare the # of utterances with the # of XDS annotations for ",
