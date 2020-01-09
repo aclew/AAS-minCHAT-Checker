@@ -41,7 +41,7 @@ _Figure 2._ Select all tiers and make sure your time column settings are set up 
 
 ### Run automated error detection
 
-5. Go to [https://aclew.shinyapps.io/AAS-minCHAT-Checker/]()
+5. Go to [https://aclew.shinyapps.io/AAS-minCHAT-Checker/](https://aclew.shinyapps.io/AAS-minCHAT-Checker/)
 
 6. Upload the file and click `Submit`.
 
