@@ -59,10 +59,10 @@ check.annotations <- function(annfile, nameannfile) {
   check_minCHATspclchr <- function(utt, minCHATspclchr) {
     if (minCHATspclchr == "squarebraces") {
       utterance <- gsub(
-        "<[[:alnum:] ,.!?-_'@&=]+> _bb_",
+        "<[[:alnum:] ,.!?_'@&=:-]+> _bb_",
         "_aa_",
         gsub(
-          "(\\[: [[:alnum:] ,.!?-_'@]+\\])|(\\[=! [[:alnum:]]+\\])",
+          "(\\[: [[:alnum:] ,.!?_'@:-]+\\])|(\\[=! [[:alnum:]]+\\])",
           "_bb_",
           gsub(
             "(\\[- [[:alnum:]]{3}\\])",
@@ -72,7 +72,7 @@ check.annotations <- function(annfile, nameannfile) {
           perl = TRUE),
         perl = TRUE)
       # and now in case of <<xxx> [xxx]> [xxx] double embeddings...
-      embedded.braces.pattern <- "<[[:alnum:] ,.!?-_'@&=]*_aa_[[:alnum:] ,.!?-_'@&=]*> _bb_"
+      embedded.braces.pattern <- "<[[:alnum:] ,.!?_'@&=:-]*_aa_[[:alnum:] ,.!?-_'@&=]*> _bb_"
       if (grepl(embedded.braces.pattern, utterance)) {
         utterance <- gsub(embedded.braces.pattern, "", utterance)
       }
@@ -86,7 +86,14 @@ check.annotations <- function(annfile, nameannfile) {
       utterance <- gsub(
         "([[:alnum:]]+@s\\:[a-z]{3}[ ,.!?-])|([[:alnum:]]+@[lc])",
         "atat",
-        utt)
+        gsub(
+          "[[:alnum:]]+@s\\:[a-z]{3}>",
+          "atat>",
+          gsub(
+            "[[:alnum:]]+@s\\:[a-z]{3}]",
+            "atat]",
+            utt
+          )))
       if (grepl("@", utterance)) {
         return("incorrect use of @ sign")
       } else {
@@ -112,8 +119,8 @@ check.annotations <- function(annfile, nameannfile) {
   ##########
   
   # debugging
-  # annfile <- "input_files/1499.txt"
-  # nameannfile <- "1499.txt"
+  # annfile <- "input_files/2625.txt"
+  # nameannfile <- "2625.txt"
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
