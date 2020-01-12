@@ -66,37 +66,34 @@ check.annotations <- function(annfile, nameannfile) {
       # and now in case of <<xxx> [xxx]> [xxx] double embeddings...
       embedded.braces.pattern <-
         "<[[:alnum:] ,.!?_'@&=:-]*_aa_[[:alnum:] ,.!?-_'@&=]*> _bb_"
-      if (grepl(embedded.braces.pattern, utterance)) {
-        utterance <- gsub(embedded.braces.pattern, "", utterance)
+      if (str_detect(utterance, embedded.braces.pattern)) {
+        utterance <- str_replace_all(utterance, embedded.braces.pattern, "")
       }
-      utterance <- gsub("(_aa_)|(^_lg_)", "", utterance)
+      utterance <- str_replace_all(utterance, "(_aa_)|(^_lg_)", "")
       if (grepl("([][<>])|(_bb_)|(_aa_)|(_lg_)", utterance)) {
         return("incorrect use of square braces")
       } else {
         return("okay")
       }
     } else if (minCHATspclchr == "atsign") {
-      utterance <- gsub(
-        "([[:alnum:]]+@s\\:[a-z]{3}[ ,.!?-])|([[:alnum:]]+@[lc])",
-        "atat",
-        gsub(
+      utterance <- str_replace_all(utt,
+        "[[:alnum:]]+@s\\:[a-z]{3}]",
+        "atat]") %>%
+        str_replace_all(
           "[[:alnum:]]+@s\\:[a-z]{3}>",
-          "atat>",
-          gsub(
-            "[[:alnum:]]+@s\\:[a-z]{3}]",
-            "atat]",
-            utt
-          )))
+          "atat>") %>%
+        str_replace_all(
+          "([[:alnum:]]+@s\\:[a-z]{3}[ ,.!?-])|([[:alnum:]]+@[lc])",
+          "atat")
       if (grepl("@", utterance)) {
         return("incorrect use of @ sign")
       } else {
         return("okay")
       }
     } else if (minCHATspclchr == "ampersand") {
-      utterance <- gsub(
+      utterance <- str_replace_all(utt,
         "(&=[[:alnum:]]+)|(&[[:alnum:]_'@-]+)|([[:alnum:]_'@-]+&)",
-        "mpmp",
-        utt)
+        "mpmp")
       if (grepl("&", utterance)) {
         return("incorrect use of & sign")
       } else {
@@ -366,8 +363,9 @@ check.annotations <- function(annfile, nameannfile) {
              alert = "no utterance terminator") %>%
       select(filename, alert, onset, offset, tier, value)
     # check for the presence of multiple terminal marks in the utterance
-    utts.nopausessqbrackets <- gsub("\\[.*?\\]", "",
-      gsub(" \\(\\.*\\)", "", utts$value))
+    utts.nopausessqbrackets <- str_replace_all(
+      utts$value, " \\(\\.*\\)", "") %>%
+      str_replace_all("\\[.*?\\]", "")
     utts$value.mod <- utts.nopausessqbrackets
     overterminating.utts <- utts %>%
       mutate(
@@ -425,7 +423,7 @@ check.annotations <- function(annfile, nameannfile) {
           alert = paste(alert.sq, alert.at, alert.am, sep = ", ")) %>%
         select(filename, alert, onset, offset, tier, value) %>%
         mutate(
-          alert = gsub(", NA", "", alert))
+          alert = str_replace_all(alert, ", NA", ""))
     }
 
     # add open transcription alerts to table
@@ -488,9 +486,5 @@ check.annotations <- function(annfile, nameannfile) {
     }
 #  }
       
-  
-  # write_csv(alert.table,
-  #             paste0("possible_errors_detected-",
-  #                    gsub(" ", "_", gsub(":", "", Sys.time())), ".csv"))
   
 }
