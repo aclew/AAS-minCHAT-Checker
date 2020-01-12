@@ -1,5 +1,6 @@
 library(tidyverse)
 library(lubridate)
+library(stringr)
 
 check.annotations <- function(annfile, nameannfile) {
   #txt.input.path <- "input_files/"
@@ -58,21 +59,13 @@ check.annotations <- function(annfile, nameannfile) {
   
   check_minCHATspclchr <- function(utt, minCHATspclchr) {
     if (minCHATspclchr == "squarebraces") {
-      utterance <- gsub(
-        "<[[:alnum:] ,.!?_'@&=:-]+> _bb_",
-        "_aa_",
-        gsub(
-          "(\\[: [[:alnum:] ,.!?_'@:-]+\\])|(\\[=! [[:alnum:]]+\\])",
-          "_bb_",
-          gsub(
-            "(\\[- [[:alnum:]]{3}\\])",
-            "_lg_",
-            utt,
-            perl = TRUE),
-          perl = TRUE),
-        perl = TRUE)
+      utterance <- str_replace_all(utt, "(\\[- [[:alnum:]]{3}\\])", "_lg_") %>%
+        str_replace_all(
+          "(\\[: [[:alnum:] ,.!?_'@:-]+\\])|(\\[=! [[:alnum:]]+\\])", "_bb_") %>%
+        str_replace_all("<[[:alnum:] ,.!?_'@&=:-]+> _bb_", "_aa_")
       # and now in case of <<xxx> [xxx]> [xxx] double embeddings...
-      embedded.braces.pattern <- "<[[:alnum:] ,.!?_'@&=:-]*_aa_[[:alnum:] ,.!?-_'@&=]*> _bb_"
+      embedded.braces.pattern <-
+        "<[[:alnum:] ,.!?_'@&=:-]*_aa_[[:alnum:] ,.!?-_'@&=]*> _bb_"
       if (grepl(embedded.braces.pattern, utterance)) {
         utterance <- gsub(embedded.braces.pattern, "", utterance)
       }
